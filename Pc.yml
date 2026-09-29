@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu PC Virtual</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    background: #0874c9;
+}
+
+/* ÁREA DE TRABALHO */
+.desktop {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background:
+        radial-gradient(circle at 50% 40%, #27a9ed, #0874c9 65%, #04528f);
+}
+
+/* ÍCONES */
+.icon {
+    width: 80px;
+    height: 90px;
+    color: white;
+    text-align: center;
+    position: absolute;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.icon:hover {
+    background: rgba(255,255,255,.15);
+}
+
+.icon .emoji {
+    font-size: 42px;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.icon span {
+    font-size: 13px;
+    text-shadow: 1px 1px 3px black;
+}
+
+/* POSIÇÕES DOS ÍCONES */
+#computer {
+    top: 20px;
+    left: 15px;
+}
+
+#notepadIcon {
+    top: 115px;
+    left: 15px;
+}
+
+#browserIcon {
+    top: 210px;
+    left: 15px;
+}
+
+/* BARRA DE TAREFAS */
+.taskbar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 48px;
+    background: rgba(20,20,20,.92);
+    display: flex;
+    align-items: center;
+    z-index: 9999;
+}
+
+/* BOTÃO INICIAR */
+.start-button {
+    width: 65px;
+    height: 48px;
+    color: white;
+    font-size: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.start-button:hover {
+    background: rgba(255,255,255,.12);
+}
+
+/* RELÓGIO */
+.clock {
+    margin-left: auto;
+    color: white;
+    padding: 0 18px;
+    font-size: 13px;
+    text-align: center;
+}
+
+/* MENU INICIAR */
+.start-menu {
+    position: absolute;
+    bottom: 48px;
+    left: 0;
+    width: 320px;
+    height: 420px;
+    background: rgba(30,30,30,.97);
+    color: white;
+    display: none;
+    z-index: 9998;
+    border: 1px solid #555;
+    box-shadow: 0 0 20px rgba(0,0,0,.5);
+}
+
+.start-menu h2 {
+    padding: 20px;
+    font-size: 22px;
+}
+
+.start-item {
+    padding: 15px 20px;
+    cursor: pointer;
+}
+
+.start-item:hover {
+    background: #1769aa;
+}
+
+/* JANELAS */
+.window {
+    position: absolute;
+    width: 600px;
+    height: 400px;
+    background: #eee;
+    border: 1px solid #333;
+    box-shadow: 0 10px 40px rgba(0,0,0,.5);
+    display: none;
+    z-index: 100;
+}
+
+/* BARRA DA JANELA */
+.titlebar {
+    height: 36px;
+    background: #202020;
+    color: white;
+    display: flex;
+    align-items: center;
+    padding-left: 12px;
+    cursor: move;
+}
+
+.title {
+    flex: 1;
+}
+
+.window-buttons {
+    display: flex;
+}
+
+.window-buttons button {
+    width: 42px;
+    height: 36px;
+    border: none;
+    color: white;
+    background: transparent;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.window-buttons button:hover {
+    background: #444;
+}
+
+.window-buttons .close:hover {
+    background: #d33;
+}
+
+/* CONTEÚDO */
+.window-content {
+    height: calc(100% - 36px);
+    background: white;
+    overflow: auto;
+}
+
+/* EXPLORADOR */
+.explorer {
+    display: flex;
+    height: 100%;
+}
+
+.sidebar {
+    width: 150px;
+    background: #eee;
+    padding: 10px;
+}
+
+.sidebar div {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.sidebar div:hover {
+    background: #ddd;
+}
+
+.files {
+    padding: 20px;
+    flex: 1;
+}
+
+.file {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    text-align: center;
+    padding: 10px;
+}
+
+.file .emoji {
+    font-size: 40px;
+}
+
+/* BLOCO DE NOTAS */
+textarea {
+    width: 100%;
+    height: 100%;
+    border: none;
+    outline: none;
+    resize: none;
+    padding: 15px;
+    font-family: Consolas, monospace;
+    font-size: 15px;
+}
+
+/* NAVEGADOR */
+.browser {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.browser-bar {
+    display: flex;
+    padding: 8px;
+    background: #ddd;
+    gap: 5px;
+}
+
+.browser-bar input {
+    flex: 1;
+    height: 32px;
+    border: 1px solid #aaa;
+    padding: 5px;
+}
+
+.browser-bar button {
+    width: 60px;
+}
+
+.browser-page {
+    flex: 1;
+    padding: 30px;
+    overflow: auto;
+}
+
+/* TERMINAL */
+.terminal {
+    background: #080808;
+    color: #00ff66;
+    font-family: Consolas, monospace;
+    padding: 15px;
+    height: 100%;
+}
+
+.terminal-output {
+    white-space: pre-wrap;
+}
+
+.terminal-input {
+    display: flex;
+}
+
+.terminal-input span {
+    margin-right: 5px;
+}
+
+.terminal-input input {
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #00ff66;
+    font-family: inherit;
+    flex: 1;
+}
+
+/* RESPONSIVO */
+@media(max-width:700px) {
+    .window {
+        width: 90vw;
+        height: 70vh;
+        left: 5vw !important;
+        top: 5vh !important;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="desktop" id="desktop">
+
+    <!-- ÍCONES -->
+    <div class="icon" id="computer" ondblclick="openWindow('explorer')">
+        <div class="emoji">💻</div>
+        <span>Este PC</span>
+    </div>
+
+    <div class="icon" id="notepadIcon" ondblclick="openWindow('notepad')">
+        <div class="emoji">📝</div>
+        <span>Bloco de Notas</span>
+    </div>
+
+    <div class="icon" id="browserIcon" ondblclick="openWindow('browser')">
+        <div class="emoji">🌐</div>
+        <span>Navegador</span>
+    </div>
+
+
+    <!-- EXPLORADOR -->
+    <div class="window" id="explorer"
+         style="left:180px;top:80px;">
+
+        <div class="titlebar">
+            <div class="title">📁 Este PC</div>
+
+            <div class="window-buttons">
+                <button onclick="minimizeWindow('explorer')">—</button>
+                <button onclick="maximizeWindow('explorer')">□</button>
+                <button class="close"
+                        onclick="closeWindow('explorer')">×</button>
+            </div>
+        </div>
+
+        <div class="window-content explorer">
+
+            <div class="sidebar">
+                <div>🏠 Início</div>
+                <div>💻 Este PC</div>
+                <div>📁 Documentos</div>
+                <div>🖼️ Imagens</div>
+                <div>🎵 Música</div>
+            </div>
+
+            <div class="files">
+
+                <h2>Este PC</h2>
+                <br>
+
+                <div class="file">
+                    <div class="emoji">💾</div>
+                    Disco Local
+                </div>
+
+                <div class="file">
+                    <div class="emoji">📁</div>
+                    Documentos
+                </div>
+
+                <div class="file">
+                    <div class="emoji">🖼️</div>
+                    Imagens
+                </div>
+
+                <div class="file">
+                    <div class="emoji">🎵</div>
+                    Música
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- BLOCO DE NOTAS -->
+    <div class="window" id="notepad"
+         style="left:250px;top:120px;">
+
+        <div class="titlebar">
+            <div class="title">📝 Bloco de Notas</div>
+
+            <div class="window-buttons">
+                <button onclick="minimizeWindow('notepad')">—</button>
+                <button onclick="maximizeWindow('notepad')">□</button>
+                <button class="close"
+                        onclick="closeWindow('notepad')">×</button>
+            </div>
+        </div>
+
+        <div class="window-content">
+
+            <textarea id="notepadText"
+                placeholder="Digite alguma coisa..."></textarea>
+
+        </div>
+
+    </div>
+
+
+    <!-- NAVEGADOR -->
+    <div class="window" id="browser"
+         style="left:220px;top:70px;">
+
+        <div class="titlebar">
+
+            <div class="title">🌐 Navegador</div>
+
+            <div class="window-buttons">
+                <button onclick="minimizeWindow('browser')">—</button>
+                <button onclick="maximizeWindow('browser')">□</button>
+                <button class="close"
+                        onclick="closeWindow('browser')">×</button>
+            </div>
+
+        </div>
+
+        <div class="window-content browser">
+
+            <div class="browser-bar">
+
+                <input
+                    id="urlInput"
+                    value="https://www.google.com"
+                    placeholder="Digite um endereço">
+
+                <button onclick="goToSite()">Ir</button>
+
+            </div>
+
+            <div class="browser-page">
+
+                <h1>Meu Navegador</h1>
+
+                <br>
+
+                <p>
+                    Digite um endereço acima e clique em "Ir".
+                </p>
+
+                <br>
+
+                <p>
+                    Este navegador é apenas uma simulação da interface
+                    de um PC virtual.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- TERMINAL -->
+    <div class="window" id="terminal"
+         style="left:300px;top:100px;width:650px;height:420px;">
+
+        <div class="titlebar">
+
+            <div class="title">⌨ Terminal</div>
+
+            <div class="window-buttons">
+
+                <button onclick="minimizeWindow('terminal')">
+                    —
+                </button>
+
+                <button onclick="maximizeWindow('terminal')">
+                    □
+                </button>
+
+                <button class="close"
+                        onclick="closeWindow('terminal')">
+                    ×
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="window-content terminal">
+
+            <div class="terminal-output" id="terminalOutput">
+Meu PC Virtual v1.0
+Digite "help" para ver os comandos.
+
+</div>
+
+            <div class="terminal-input">
+
+                <span>user@virtualpc:~$</span>
+
+                <input
+                    id="terminalInput"
+                    autocomplete="off"
+                    onkeydown="terminalCommand(event)">
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- MENU INICIAR -->
+    <div class="start-menu" id="startMenu">
+
+        <h2>🪟 Meu PC</h2>
+
+        <div class="start-item"
+             onclick="openWindow('explorer')">
+            💻 Este PC
+        </div>
+
+        <div class="start-item"
+             onclick="openWindow('notepad')">
+            📝 Bloco de Notas
+        </div>
+
+        <div class="start-item"
+             onclick="openWindow('browser')">
+            🌐 Navegador
+        </div>
+
+        <div class="start-item"
+             onclick="openWindow('terminal')">
+            ⌨ Terminal
+        </div>
+
+        <div class="start-item"
+             onclick="alert('Meu PC Virtual\\nVersão 1.0')">
+            ℹ️ Sobre
+        </div>
+
+    </div>
+
+
+    <!-- BARRA DE TAREFAS -->
+    <div class="taskbar">
+
+        <div class="start-button"
+             onclick="toggleStart()">
+            🪟
+        </div>
+
+        <div class="clock" id="clock"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* ==========================
+   VARIÁVEIS
+========================== */
+
+let highestZ = 100;
+
+
+/* ==========================
+   ABRIR JANELA
+========================== */
+
+function openWindow(id) {
+
+    const win = document.getElementById(id);
+
+    win.style.display = "block";
+
+    highestZ++;
+
+    win.style.zIndex = highestZ;
+
+    document.getElementById("startMenu").style.display = "none";
+}
+
+
+/* ==========================
+   FECHAR JANELA
+========================== */
+
+function closeWindow(id) {
+
+    document.getElementById(id).style.display = "none";
+}
+
+
+/* ==========================
+   MINIMIZAR
+========================== */
+
+function minimizeWindow(id) {
+
+    document.getElementById(id).style.display = "none";
+}
+
+
+/* ==========================
+   MAXIMIZAR
+========================== */
+
+function maximizeWindow(id) {
+
+    const win = document.getElementById(id);
+
+    if (win.dataset.maximized === "true") {
+
+        win.style.width = win.dataset.oldWidth;
+        win.style.height = win.dataset.oldHeight;
+        win.style.left = win.dataset.oldLeft;
+        win.style.top = win.dataset.oldTop;
+
+        win.dataset.maximized = "false";
+
+    } else {
+
+        win.dataset.oldWidth = win.style.width;
+        win.dataset.oldHeight = win.style.height;
+        win.dataset.oldLeft = win.style.left;
+        win.dataset.oldTop = win.style.top;
+
+        win.style.left = "0";
+        win.style.top = "0";
+        win.style.width = "100vw";
+        win.style.height = "calc(100vh - 48px)";
+
+        win.dataset.maximized = "true";
+    }
+
+    highestZ++;
+
+    win.style.zIndex = highestZ;
+}
+
+
+/* ==========================
+   MENU INICIAR
+========================== */
+
+function toggleStart() {
+
+    const menu = document.getElementById("startMenu");
+
+    if (menu.style.display === "block") {
+
+        menu.style.display = "none";
+
+    } else {
+
+        menu.style.display = "block";
+    }
+}
+
+
+/* ==========================
+   RELÓGIO
+========================== */
+
+function updateClock() {
+
+    const now = new Date();
+
+    const time = now.toLocaleTimeString(
+        "pt-BR",
+        {
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+
+    const date = now.toLocaleDateString(
+        "pt-BR"
+    );
+
+    document.getElementById("clock").innerHTML =
+        time + "<br>" + date;
+}
+
+setInterval(updateClock, 1000);
+
+updateClock();
+
+
+/* ==========================
+   NAVEGADOR
+========================== */
+
+function goToSite() {
+
+    let url =
+        document.getElementById("urlInput").value.trim();
+
+    if (!url) return;
+
+    if (!url.startsWith("http://") &&
+        !url.startsWith("https://")) {
+
+        url = "https://" + url;
+    }
+
+    window.open(url, "_blank");
+}
+
+
+/* ==========================
+   TERMINAL
+========================== */
+
+function terminalCommand(event) {
+
+    if (event.key !== "Enter") return;
+
+    const input =
+        document.getElementById("terminalInput");
+
+    const output =
+        document.getElementById("terminalOutput");
+
+    const command =
+        input.value.trim().toLowerCase();
+
+    output.textContent +=
+        "\nuser@virtualpc:~$ " + command;
+
+    input.value = "";
+
+
+    if (command === "help") {
+
+        output.textContent +=
+`
+Comandos disponíveis:
+
+help       - mostra esta lista
+clear      - limpa o terminal
+about      - informações do sistema
+date       - mostra a data
+time       - mostra a hora
+echo texto - escreve um texto
+pc         - informações do PC
+`;
+
+    }
+
+    else if (command === "clear") {
+
+        output.textContent = "";
+
+    }
+
+    else if (command === "about") {
+
+        output.textContent +=
+            "\nMeu PC Virtual - sistema simulado em HTML/CSS/JS";
+
+    }
+
+    else if (command === "date") {
+
+        output.textContent +=
+            "\n" + new Date().toLocaleDateString("pt-BR");
+
+    }
+
+    else if (command === "time") {
+
+        output.textContent +=
+            "\n" + new Date().toLocaleTimeString("pt-BR");
+
+    }
+
+    else if (command === "pc") {
+
+        output.textContent +=
+`
+Sistema: Meu PC Virtual
+Arquitetura: JavaScript
+CPU: Virtual CPU
+RAM: Virtual RAM
+Disco: Virtual Disk
+`;
+
+    }
+
+    else if (command.startsWith("echo ")) {
+
+        output.textContent +=
+            "\n" + command.substring(5);
+
+    }
+
+    else if (command !== "") {
+
+        output.textContent +=
+            "\nComando não encontrado: " + command;
+
+    }
+
+    output.scrollTop = output.scrollHeight;
+}
+
+
+/* ==========================
+   CLICAR NAS JANELAS
+========================== */
+
+document.querySelectorAll(".window").forEach(win => {
+
+    win.addEventListener("mousedown", () => {
+
+        highestZ++;
+
+        win.style.zIndex = highestZ;
+
+    });
+
+});
+
+
+/* ==========================
+   ARRASTAR JANELAS
+========================== */
+
+document.querySelectorAll(".titlebar").forEach(bar => {
+
+    let dragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    const windowElement =
+        bar.parentElement;
+
+
+    bar.addEventListener("mousedown", function(e) {
+
+        if (e.target.tagName === "BUTTON") return;
+
+        dragging = true;
+
+        const rect =
+            windowElement.getBoundingClientRect();
+
+        offsetX = e.clientX - rect.left;
+        offsetY = e.clientY - rect.top;
+
+        highestZ++;
+
+        windowElement.style.zIndex = highestZ;
+
+    });
+
+
+    document.addEventListener("mousemove", function(e) {
+
+        if (!dragging) return;
+
+        windowElement.style.left =
+            (e.clientX - offsetX) + "px";
+
+        windowElement.style.top =
+            (e.clientY - offsetY) + "px";
+
+    });
+
+
+    document.addEventListener("mouseup", function() {
+
+        dragging = false;
+
+    });
+
+});
+
+
+/* ==========================
+   ESC FECHA MENU
+========================== */
+
+document.addEventListener("keydown", function(e) {
+
+    if (e.key === "Escape") {
+
+        document.getElementById("startMenu")
+            .style.display = "none";
+
+    }
+
+});
+
+</script>
+
+</body>
+</html>
