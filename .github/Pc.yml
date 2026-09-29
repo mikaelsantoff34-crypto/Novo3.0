@@ -1,0 +1,75 @@
+name: Windows Virtual Machine
+
+on:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    name: Windows VM
+    runs-on: windows-2025
+
+    steps:
+
+      - name: Informações do Windows
+        shell: powershell
+        run: |
+          Write-Host "================================"
+          Write-Host "       WINDOWS VIRTUAL MACHINE"
+          Write-Host "================================"
+          Write-Host ""
+
+          Write-Host "Sistema:"
+          Get-CimInstance Win32_OperatingSystem |
+            Select-Object Caption, Version, OSArchitecture
+
+          Write-Host ""
+          Write-Host "Processador:"
+          Get-CimInstance Win32_Processor |
+            Select-Object Name, NumberOfCores, NumberOfLogicalProcessors
+
+          Write-Host ""
+          Write-Host "Memória:"
+          $ram = Get-CimInstance Win32_ComputerSystem
+          Write-Host "$([math]::Round($ram.TotalPhysicalMemory / 1GB, 2)) GB"
+
+          Write-Host ""
+          Write-Host "Disco:"
+          Get-PSDrive C |
+            Select-Object Used, Free
+
+      - name: Criar pasta da VM
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Force -Path C:\VirtualPC
+
+      - name: Instalar ferramentas
+        shell: powershell
+        run: |
+          winget install --id 7zip.7zip `
+            --silent `
+            --accept-package-agreements `
+            --accept-source-agreements
+
+      - name: Testar Windows
+        shell: powershell
+        run: |
+          Write-Host ""
+          Write-Host "Windows funcionando!"
+          Write-Host ""
+
+          Write-Host "Usuário:"
+          $env:USERNAME
+
+          Write-Host ""
+          Write-Host "Computador:"
+          $env:COMPUTERNAME
+
+      - name: Manter o ambiente ativo
+        shell: powershell
+        run: |
+          Write-Host ""
+          Write-Host "A VM Windows está sendo executada."
+          Write-Host "Ela continuará disponível enquanto este job estiver rodando."
+          Write-Host ""
+
+          Start-Sleep -Seconds 300
